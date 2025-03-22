@@ -1,0 +1,12 @@
+# render.yaml
+services:
+  - type: cron
+    name: eventos-scraper
+    runtime: docker
+    plan: free
+    schedule: "0 */6 * * *"  # Ejecutar cada 6 horas
+    buildCommand: ""
+    startCommand: python main.py
+    envVars:
+      - key: TZ
+        value: America/Bogota  # Zona horaria de Bogotá, Colombia
