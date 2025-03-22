@@ -6,6 +6,6 @@
   },
   "deploy": {
     "restartPolicyType": "CRON",
-    "restartPolicyRate": "0 12 * * *"
+    "restartPolicyRate": "0 8 * * *"
   }
 }
