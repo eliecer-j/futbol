@@ -1,11 +1,13 @@
-# Dockerfile
-FROM mcr.microsoft.com/playwright/python:latest
+FROM python:3.10-slim
 
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY main.py .
+# Instalar Playwright y navegadores
+RUN playwright install chromium --with-deps
 
-CMD ["python", "main.py"]
+COPY . .
+
+CMD ["python", "tu_script.py"]
