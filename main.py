@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright
 import json
 import time
+import supabase
 
 def extraer_eventos():
     with sync_playwright() as p:
@@ -19,33 +20,37 @@ def extraer_eventos():
         # pero podemos ejecutar el código JavaScript para acceder a allEvents
         
         # Verificar si allEvents existe y guardarlo
-        result = page.evaluate("""
-        () => {
-            // Intentar acceder a allEvents
-            if (typeof allEvents !== 'undefined') {
-                window.savedEvents = allEvents;
-                return JSON.stringify(allEvents);
-            } else {
-                // Si no existe, esperar a que se cargue
-                return new Promise((resolve) => {
-                    // Crear un observer para detectar cuándo se crea allEvents
-                    let checkExist = setInterval(() => {
-                        if (typeof allEvents !== 'undefined') {
+        try:
+            
+            result = page.evaluate("""
+            () => {
+                // Intentar acceder a allEvents
+                if (typeof allEvents !== 'undefined') {
+                    window.savedEvents = allEvents;
+                    return JSON.stringify(allEvents);
+                } else {
+                    // Si no existe, esperar a que se cargue
+                    return new Promise((resolve) => {
+                        // Crear un observer para detectar cuándo se crea allEvents
+                        let checkExist = setInterval(() => {
+                            if (typeof allEvents !== 'undefined') {
+                                clearInterval(checkExist);
+                                window.savedEvents = allEvents;
+                                resolve(JSON.stringify(allEvents));
+                            }
+                        }, 100);
+                        
+                        // Timeout después de 10 segundos
+                        setTimeout(() => {
                             clearInterval(checkExist);
-                            window.savedEvents = allEvents;
-                            resolve(JSON.stringify(allEvents));
-                        }
-                    }, 100);
-                    
-                    // Timeout después de 10 segundos
-                    setTimeout(() => {
-                        clearInterval(checkExist);
-                        resolve(null);
-                    }, 10000);
-                });
+                            resolve(null);
+                        }, 10000);
+                    });
+                }
             }
-        }
-        """)
+            """)
+        except BaseException as e:
+            print(e, 'no se pudo extraer la data')
         
         # Si encontramos los datos, los guardamos
         if result:
@@ -54,17 +59,26 @@ def extraer_eventos():
                 if res['status']:
                     res.pop('status')
                     data.append(res)
-            eventos = data
-            with open('eventos_deportivos.json', 'w', encoding='utf-8') as f:
-                json.dump(eventos, f, ensure_ascii=False, indent=2)
-            print(f"Se han guardado {len(eventos)} eventos en eventos_deportivos.json")
+            
+            return data
         else:
             print("No se pudieron encontrar los eventos")
         
         # Cerrar el navegador
         browser.close()
 
-if __name__ == "__main__":
-    extraer_eventos()
+def database():
+    data = supabase.create_client(
+        supabase_url="https://wbvkmekdjbapttseyrpx.supabase.co", 
+                           supabase_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndidmttZWtkamJhcHR0c2V5cnB4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MjYxNjU4MywiZXhwIjoyMDU4MTkyNTgzfQ.vAWWknSAq4pHIuIlisyJzH8cOGQw44ceGsDxBDprp3w")
 
-arr = []
+    try:
+
+        r = data.from_('data_futbol').insert(json=extraer_eventos()).execute()
+        print(r)
+    except supabase.NotConnectedError as e:
+        print(e, 'no se conecto')
+    
+    
+if __name__ == "__main__":
+    database()
