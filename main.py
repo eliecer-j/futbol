@@ -86,9 +86,14 @@ def delete():
                            supabase_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndidmttZWtkamJhcHR0c2V5cnB4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MjYxNjU4MywiZXhwIjoyMDU4MTkyNTgzfQ.vAWWknSAq4pHIuIlisyJzH8cOGQw44ceGsDxBDprp3w")
 
     try:
-        r = data.from_('data_futbol').delete().execute()
-        if r :
-            print('eliminado con exito')
+        arr = data.from_('data_futbol').select('id').execute()
+        rows = [x['id'] for x in arr.data]
+        
+        res = data.from_('data_futbol').delete().in_('id', rows).execute()
+        if len(res.data) == 0:
+            print('data eliminada', res.data)
+        else:
+            print('no se elimino al data')
 
     except supabase.AuthUnknownError as e:
         print(e)
@@ -97,3 +102,4 @@ if __name__ == "__main__":
     delete()
     time.sleep(30)
     database()
+    
