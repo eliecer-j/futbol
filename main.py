@@ -94,7 +94,7 @@ def delete():
         
         res = data.from_('data_futbol').delete().in_('id', rows).execute()
         
-        print('data eliminada', res.data)
+        print('data eliminada =>>' , res.data)
        
 
     except supabase.AuthUnknownError as e:
