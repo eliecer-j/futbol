@@ -5,15 +5,15 @@ import supabase
 
 def extraer_eventos():
     with sync_playwright() as p:
-        # Lanzar el navegador
+        
         browser = p.chromium.launch(headless=True) # headless=False para ver el navegador
         context = browser.new_context()
         page = context.new_page()
         
-        # Navegar a la página
+        
         page.goto("https://streamtp3.com/eventos.html")
         
-        # Esperar a que la página cargue (ajusta según sea necesario)
+        
         page.wait_for_load_state("networkidle")
         
         # Abrir DevTools programáticamente no es posible directamente,
@@ -52,7 +52,7 @@ def extraer_eventos():
         except BaseException as e:
             print(e, 'no se pudo extraer la data')
         
-        # Si encontramos los datos, los guardamos
+        
         if result:
             data = []
             for res in json.loads(result):
@@ -64,7 +64,7 @@ def extraer_eventos():
         else:
             print("No se pudieron encontrar los eventos")
         
-        # Cerrar el navegador
+        
         browser.close()
 
 def database():
@@ -79,6 +79,21 @@ def database():
     except supabase.NotConnectedError as e:
         print(e, 'no se conecto')
     
+
+def delete():
+    data = supabase.create_client(
+        supabase_url="https://wbvkmekdjbapttseyrpx.supabase.co", 
+                           supabase_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndidmttZWtkamJhcHR0c2V5cnB4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MjYxNjU4MywiZXhwIjoyMDU4MTkyNTgzfQ.vAWWknSAq4pHIuIlisyJzH8cOGQw44ceGsDxBDprp3w")
+
+    try:
+        r = data.from_('data_futbol').delete().execute()
+        if r :
+            print('eliminado con exito')
+
+    except supabase.AuthUnknownError as e:
+        print(e)
     
 if __name__ == "__main__":
+    delete()
+    time.sleep(30)
     database()
