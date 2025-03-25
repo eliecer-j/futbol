@@ -93,8 +93,8 @@ def delete():
         rows = [x['id'] for x in arr.data]
         
         res = data.from_('data_futbol').delete().in_('id', rows).execute()
-        print(len(res.data), 'longitud de datos despues de eliminar')
-        if len(res.data) == 0:
+        print(len(arr.data), 'longitud de datos despues de eliminar')
+        if len(arr.data) == 0:
             print('data eliminada', res.data)
         else:
             print('no se elimino al data')
