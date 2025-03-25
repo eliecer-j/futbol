@@ -68,6 +68,9 @@ def extraer_eventos():
         browser.close()
 
 def database():
+    if len(extraer_eventos()) < 5:
+        print('error al extraer la data en el scraping')
+        return
     data = supabase.create_client(
         supabase_url="https://wbvkmekdjbapttseyrpx.supabase.co", 
                            supabase_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndidmttZWtkamJhcHR0c2V5cnB4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MjYxNjU4MywiZXhwIjoyMDU4MTkyNTgzfQ.vAWWknSAq4pHIuIlisyJzH8cOGQw44ceGsDxBDprp3w")
