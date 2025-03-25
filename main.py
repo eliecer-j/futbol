@@ -103,6 +103,6 @@ def delete():
     
 if __name__ == "__main__":
     delete()
-    time.sleep(30)
+    time.sleep(15)
     database()
     
