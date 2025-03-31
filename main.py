@@ -50,7 +50,7 @@ def extraer_eventos():
             }
             """)
         except BaseException as e:
-            print(e, 'no se pudo extraer la data')
+            print(e, 'no se pudo extraer la data en https://streamtp4.com')
         
         
         if result:
