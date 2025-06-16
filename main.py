@@ -6,7 +6,7 @@ import supabase
 def extraer_eventos():
     with sync_playwright() as p:
         
-        browser = p.chromium.launch(headless=True) # headless=False para ver el navegador
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-gpu", "--disable-software-rasterizer"]) # headless=False para ver el navegador
         context = browser.new_context()
         page = context.new_page()
         
