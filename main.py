@@ -5,16 +5,25 @@ import supabase
 
 def extraer_eventos():
     with sync_playwright() as p:
+
         
-        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-gpu", "--disable-software-rasterizer"]) # headless=False para ver el navegador
+        
+        browser = p.chromium.launch(headless=True) # headless=False para ver el navegador
         context = browser.new_context()
+        page1 = context.new_page()
+        
+
+        
+        #page.goto(f"{url}")
+        page1.goto('https://streamtp3.com/eventos.html', wait_until='load')
+        page1.wait_for_load_state("networkidle")
+        r = page1.url
         page = context.new_page()
-        
-        
-        page.goto("https://stream196tp.com/eventos.html")
-        
+        page.goto(url=r+'eventos.html')
         
         page.wait_for_load_state("networkidle")
+        print(page.url)
+        
         
         # Abrir DevTools programáticamente no es posible directamente,
         # pero podemos ejecutar el código JavaScript para acceder a allEvents
@@ -63,6 +72,7 @@ def extraer_eventos():
             return data
         else:
             print("No se pudieron encontrar los eventos")
+            
         
         
         browser.close()
@@ -102,6 +112,6 @@ def delete():
     
 if __name__ == "__main__":
     delete()
-    time.sleep(10)
+    time.sleep(5)
     database()
     
