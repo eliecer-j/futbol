@@ -15,14 +15,14 @@ def extraer_eventos():
 
         
         #page.goto(f"{url}")
-        page1.goto('https://streamtp3.com/eventos.html', wait_until='load')
+        page1.goto('https://streamtpglobal.com/eventos.html', wait_until='load')
         page1.wait_for_load_state("networkidle")
-        r = page1.url
-        page = context.new_page()
-        page.goto(url=r+'eventos.html')
+        #r = page1.url
+       # page = context.new_page()
+        #page.goto(url=r+'eventos.html')
         
-        page.wait_for_load_state("networkidle")
-        print(page.url)
+       # page.wait_for_load_state("networkidle")
+       # print(page.url)
         
         
         # Abrir DevTools programáticamente no es posible directamente,
@@ -31,7 +31,7 @@ def extraer_eventos():
         # Verificar si allEvents existe y guardarlo
         try:
             
-            result = page.evaluate("""
+            result = page1.evaluate("""
             () => {
                 // Intentar acceder a allEvents
                 if (typeof allEvents !== 'undefined') {
@@ -115,3 +115,4 @@ if __name__ == "__main__":
     time.sleep(5)
     database()
     
+
