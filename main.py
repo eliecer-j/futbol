@@ -15,7 +15,7 @@ def extraer_eventos():
 
         
         #page.goto(f"{url}")
-        page1.goto('https://streamtpglobal.com/eventos.html', wait_until='load')
+        page1.goto('https://streamtpmedia.com/eventos.html', wait_until='load')
         page1.wait_for_load_state("networkidle")
         #r = page1.url
        # page = context.new_page()
@@ -115,4 +115,5 @@ if __name__ == "__main__":
     time.sleep(5)
     database()
     
+
 
