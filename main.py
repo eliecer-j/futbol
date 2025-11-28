@@ -79,7 +79,7 @@ def extraer_eventos():
 
 def database():
     if len(extraer_eventos()) < 5:
-        print('error al extraer la data en el scraping')
+        print('error >> la longitud de la data es 0')
         return
     data = supabase.create_client(
         supabase_url="https://wbvkmekdjbapttseyrpx.supabase.co", 
@@ -115,5 +115,6 @@ if __name__ == "__main__":
     time.sleep(5)
     database()
     
+
 
 
