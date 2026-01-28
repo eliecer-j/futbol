@@ -1,84 +1,28 @@
-from playwright.sync_api import sync_playwright
-import json
-import time
+import requests, json, time
 import supabase
 
-def extraer_eventos():
-    with sync_playwright() as p:
 
-        
-        
-        browser = p.chromium.launch(headless=True) # headless=False para ver el navegador
-        context = browser.new_context()
-        page1 = context.new_page()
-        
 
+def scraper():
+    
+    try:
         
-        #page.goto(f"{url}")
-        page1.goto('https://streamtpmedia.com/eventos.html', wait_until='load')
-        page1.wait_for_load_state("networkidle")
-        #r = page1.url
-       # page = context.new_page()
-        #page.goto(url=r+'eventos.html')
-        
-       # page.wait_for_load_state("networkidle")
-       # print(page.url)
-        
-        
-        # Abrir DevTools programáticamente no es posible directamente,
-        # pero podemos ejecutar el código JavaScript para acceder a allEvents
-        
-        # Verificar si allEvents existe y guardarlo
-        try:
-            
-            result = page1.evaluate("""
-            () => {
-                // Intentar acceder a allEvents
-                if (typeof allEvents !== 'undefined') {
-                    window.savedEvents = allEvents;
-                    return JSON.stringify(allEvents);
-                } else {
-                    // Si no existe, esperar a que se cargue
-                    return new Promise((resolve) => {
-                        // Crear un observer para detectar cuándo se crea allEvents
-                        let checkExist = setInterval(() => {
-                            if (typeof allEvents !== 'undefined') {
-                                clearInterval(checkExist);
-                                window.savedEvents = allEvents;
-                                resolve(JSON.stringify(allEvents));
-                            }
-                        }, 100);
-                        
-                        // Timeout después de 10 segundos
-                        setTimeout(() => {
-                            clearInterval(checkExist);
-                            resolve(null);
-                        }, 10000);
-                    });
-                }
-            }
-            """)
-        except BaseException as e:
-            print(e, 'no se pudo extraer la data en https://streamtp4.com')
-        
-        
-        if result:
-            data = []
-            for res in json.loads(result):
-                if res['status']:
-                    res.pop('status')
-                    data.append(res)
-            
-            return data
-        else:
-            print("No se pudieron encontrar los eventos")
-            
-        
-        
-        browser.close()
+        url = 'https://streamtp10.com/eventos.json'
+        arr = []
+        res = requests.get(url=url)
+        res.encoding = 'utf-8'
+        for data in json.loads(res.text):
+            del data['language']
+            del data['status']
+            arr.append(data)
+        return arr
+
+    except ConnectionError as e:
+        print('conexion a url fallida', e)
+
 
 def database():
-    if len(extraer_eventos()) < 5:
+    if len(scraper()) < 5:
         print('error >> la longitud de la data es 0')
         return
     data = supabase.create_client(
@@ -87,7 +31,7 @@ def database():
 
     try:
 
-        r = data.from_('data_futbol').insert(json=extraer_eventos()).execute()
+        r = data.from_('data_futbol').insert(json=scraper()).execute()
         print(r)
     except supabase.NotConnectedError as e:
         print(e, 'no se conecto')
@@ -109,12 +53,11 @@ def delete():
 
     except supabase.AuthUnknownError as e:
         print(e)
-    
-if __name__ == "__main__":
+
+
+
+if __name__ == '__main__':
     delete()
     time.sleep(5)
+    scraper()
     database()
-    
-
-
-
